@@ -110,3 +110,48 @@ Test Size :  (45, 10)
 Validation Size :  (44, 10)
 ```
 
+
+### Step 4: Initializing Parameters
+This code initializes the parameters for the linear regression model:
+
+m, n: The shape of the feature matrix X, where m is the number of samples (442) and n is the number of features (10). w: The weight vector, initialized to zeros with shape [10,]. b: The bias term, initialized to 0.
+
+```python
+m, n = X.shape   # m = 353, n = 10
+w = np.zeros(n)  # Weight vector (shape: [10,])
+b = 0            # Bias term (scalar)
+```
+
+
+### Step 5: Defining the Prediction Function
+The prediction function is given by:
+
+$$
+\large \hat{y}_{(i)} = \sum_{j=1}^{n} w_j x_j^{(i)} + b
+$$
+
+
+
+**Where:**
+
+ $$ \hat{y}_{(i)} = \text{predicted target value for the } i\text{-th sample.} $$
+ $$ w_j = \text{weight for the } j\text{-th feature.} $$
+ $$ x_j^{(i)} = \text{value of the } j\text{-th feature for the } i\text{-th sample.} $$
+
+ This code defines the **predict** function, which calculates the predicted target values for each sample using the feature matrix **X**, weight vector **w**, and bias term **b**:
+
+- **X**: The feature matrix (shape: [m, n]), where **m** is the number of samples and **n** is the number of features.
+- **w**: The weight vector (shape: [n,]), which contains the learned weights for each feature.
+- **b**: The bias term (scalar), which is added to the weighted sum.
+
+The function uses the following formula to compute the predictions:
+
+$$
+\hat{y} = Xw + b
+$$
+
+```python
+def predict(X, w, b):
+    return np.dot(X, w) + b
+```
+
