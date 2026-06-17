@@ -43,7 +43,7 @@ $$b := b - \alpha \frac{\partial J}{\partial b}$$
 
 ## 💻 Python Source Code
 
-### Step 1: The Manual Approach
+### Step 1 & 2: The Manual Approach
 First, we will import libraries & load dataset.
 
 ```python
@@ -76,5 +76,37 @@ Feature values: [[ 0.03807591  0.05068012  0.06169621  0.02187239 -0.0442235  -0
 First five target values: [151.  75. 141. 206. 135.]
 x shape: (442, 10)
 y shape: (442,)
+```
+
+### Step 3: Data Preparation
+The following code standardizes the features and splits the dataset into training, validation & testing sets:
+
+StandardScaler: Standardizes the feature matrix by removing the mean and scaling to unit variance.
+train_test_valid_split: Splits the dataset into training (80%) and testing (10%) & validation (10%) sets.
+The feature matrix X is transformed, and the dataset is divided into X, X_test, y, and y_test.
+
+```python
+feature_scaler = StandardScaler()
+target_scaler = StandardScaler()
+
+X = feature_scaler.fit_transform(X)
+
+y = y.reshape(-1, 1)
+y = target_scaler.fit_transform(y)
+y = y.ravel()
+
+X, X_test, y, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
+
+print("Train Size : ",X.shape) #80%
+print("Test Size : ",X_test.shape) #10%
+print("Validation Size : ",X_val.shape) #10%
+
+```
+**Expected Output:**
+```text
+Train Size :  (353, 10)
+Test Size :  (45, 10)
+Validation Size :  (44, 10)
 ```
 
