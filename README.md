@@ -43,114 +43,38 @@ $$b := b - \alpha \frac{\partial J}{\partial b}$$
 
 ## 💻 Python Source Code
 
+### Step 1: The Manual Approach
+First, we will import libraries & load dataset.
+
 ```python
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import json
-from sklearn.datasets import load_diabetes
+from sklearn.datasets import load_diabetes  #loading diabetic dataset from sklearn datasets library
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import SGDRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 
-# 1. Loading the Data
 data = load_diabetes()
-X = data.data         
-Y = data.target       
 
-# 2. Preparing the data
-feature_scaler = StandardScaler()
-target_scaler = StandardScaler()
+X = data.data         # Feature matrix (shape: [442, 10])
+Y = data.target       # Target vector (shape: [442,])
 
-X = feature_scaler.fit_transform(X)
-y = Y.reshape(-1, 1)
-y = target_scaler.fit_transform(y)
-y = y.ravel()
+print('Feature names:', data.feature_names)
+print('Feature values:', X[:1])
+print('First five target values:', Y[:5])
+print('x shape:' ,X.shape)
+print('y shape:' ,Y.shape)
 
-X, X_test, y, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
+```
+**Expected Output:**
+```text
+Feature names: ['age', 'sex', 'bmi', 'bp', 's1', 's2', 's3', 's4', 's5', 's6']
+Feature values: [[ 0.03807591  0.05068012  0.06169621  0.02187239 -0.0442235  -0.03482076
+  -0.04340085 -0.00259226  0.01990749 -0.01764613]]
+First five target values: [151.  75. 141. 206. 135.]
+x shape: (442, 10)
+y shape: (442,)
+```
 
-# 3. Initializing Parameters
-m, n = X.shape   
-w = np.zeros(n)  
-b = 0            
-
-# 4. Defining Core Functions
-def predict(X, w, b):
-    return np.dot(X, w) + b
-
-def compute_cost(X, y, w, b):
-    m = len(y)
-    y_pred = predict(X, w, b)
-    cost = (1 / (2 * m)) * np.sum((y_pred - y) ** 2)
-    return cost
-
-def compute_gradients(X, y, w, b):
-    m = len(y)
-    y_pred = predict(X, w, b)
-    error = y_pred - y
-    dw = (1 / m) * np.dot(X.T, error)
-    db = (1 / m) * np.sum(error)
-    return dw, db
-
-def update_parameters(w, b, dw, db, learning_rate):
-    w = w - learning_rate * dw
-    b = b - learning_rate * db
-    return w, b
-
-# 5. Training the Model
-learning_rate = 0.001
-num_iterations = 5000
-cost_history = []
-
-for i in range(num_iterations):
-    y_pred = predict(X, w, b)
-    cost = compute_cost(X, y, w, b)
-    dw, db = compute_gradients(X, y, w, b)
-    w, b = update_parameters(w, b, dw, db, learning_rate)
-
-    val_cost = compute_cost(X_val, y_val, w, b)
-
-    if i % 500 == 0:
-      cost_history.append([cost, val_cost])
-      print(f'Iteration {i}: Cost = {cost:.4f}: Val Cost = {val_cost:.4f}')
-
-# 6. Saving parameters
-param = {'weights': w.tolist(), 'bias': b}
-with open('param.json', 'w') as f:
-    json.dump(param, f)
-
-# 7. Evaluating Model Performance with Test Data
-y_pred_test = predict(X_test, w, b)
-
-mae = np.abs(y_test - y_pred_test).mean()
-mse = ((y_test - y_pred_test)**2).mean()
-rmse = np.sqrt(((y_test - y_pred_test)**2).sum()/len(y_test))
-
-SS_res = np.sum((y_test - y_pred_test)**2)        
-SS_tot = np.sum((y_test - np.mean(y_test))**2)    
-r2_ = 1 - (SS_res / SS_tot)
-
-# 8. Comparison with Sklearn Linear Regression
-model = SGDRegressor(
-    loss='squared_error',
-    alpha=0.0,
-    learning_rate='constant',  
-    eta0=0.01,                 
-    max_iter=1000,
-    random_state=42
-)
-model.fit(X, y)  
-y_pred_test_sk = model.predict(X_test)
-
-mse_sk = mean_squared_error(y_test, y_pred_test_sk)
-r2_sk = r2_score(y_test, y_pred_test_sk)
-
-print("\n--- FINAL METRICS ---")
-print(f"Scratch MAE: {mae:.4f}")
-print(f"Scratch MSE: {mse:.4f}")
-print(f"Scratch RMSE: {rmse:.4f}")
-print(f"Scratch R2: {r2_:.4f}")
-print(f"Sklearn MSE: {mse_sk:.4f}")
-print(f"Sklearn R2: {r2_sk:.4f}")
